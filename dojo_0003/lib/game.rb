@@ -1,60 +1,38 @@
 class Game
 
+	FIRST_DAY = 1
+
 	def initialize
 		@clouds = []
 		@airports = []
 	end
 
-	def put_cloud(row, clouds)
-		@clouds[row] = clouds
+	def put_cloud(*pos)
+		@clouds << pos
 	end
 
-	def put_airport(row, airports) 
-		@airports[row] = airports
+	def put_airport(*pos)
+		@airports << pos
 	end
 
-	def day_when_first_airport_under_clouds
-
-		positions = []
-		@airports.each_with_index do |airport, x|
-			if airport
-				y = airport.first
-				positions << verifyHorizontally(x, y)
-				positions << verifyVertically(x, y)
-			end
-		end
-		min(positions) + 1
+	def reach_the_first_airport_on_day
+		closest_cloud_distances_for_each_airport.min + FIRST_DAY
 	end
 
-	def verifyHorizontally(x, y)
-		positions = []
-
-		if @clouds[x]
-			@clouds[x].each do |cloud|
-				positions << (cloud - y).abs 
-			end
-		end
-		min(positions)
+	def reach_the_last_airport_on_day
+		closest_cloud_distances_for_each_airport.max + FIRST_DAY
 	end
 
-	def verifyVertically(x, y)
-		positions = []
-
-		@clouds.each_with_index do |clouds_row, i|
-			positions << (i - x).abs if clouds_row[y]
-		end
-		min(positions)
+	def closest_cloud_distances_for_each_airport
+		@airports.map { |airport| closest_cloud_distance(airport) }
 	end
 
-	def min(array)
-		lowest_number = 9999;
-		array.each do |array|
-			if (array < lowest_number)
-				lowest_number = array
-			end
-		end
+	def closest_cloud_distance(airport)
+		@clouds.map { |cloud| distance(airport, cloud) }.min
+	end
 
-		lowest_number
+	def distance(p1, p2)	
+		p1.each_with_index.map { |x, i| (x - p2[i]).abs }.inject(:+)
 	end
 
 end
